@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Termo de Responsabilidade – Abertura de Porta Externa</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-image: url('https://i.postimg.cc/wT3r1R62/papel-timbrado-jpg.jpg');
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: top center;
+      margin: 0;
+      padding-top: 220px;
+      display: flex;
+      justify-content: center;
+    }
+    form, h1, .term-text {
+      background-color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 700px;
+    }
+    h1 {
+      color: #003366;
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input[type="text"], input[type="date"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    .radio-group {
+      margin-top: 5px;
+    }
+    .radio-group label {
+      font-weight: normal;
+      margin-right: 20px;
+    }
+    button {
+      margin-top: 25px;
+      padding: 10px 20px;
+      background-color: #003366;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #0055a5;
+    }
+    .term-text {
+      white-space: pre-wrap;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      margin-bottom: 25px;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+    .ip-group {
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 6px;
+      background-color: #fafafa;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>Termo de Responsabilidade – Abertura de Porta Externa</h1>
+
+    <div class="term-text">
+Prezados(as) Clientes,
+
+A Canaã Telecom oferece, por padrão, uma camada adicional de segurança à sua conexão por meio de nosso firewall, que protege sua rede contra ameaças externas e contribui para a estabilidade da sua internet.
+
+No entanto, conforme sua solicitação para a abertura de uma porta externa visando acesso remoto, é fundamental que você esteja ciente dos riscos envolvidos ao alterar essa proteção.
+
+Riscos associados à abertura de porta externa:
+
+- Exposição a ataques cibernéticos
+- Roubo de informações sensíveis
+- Instabilidade da conexão
+- Infecção por vírus e malware
+- Uso indevido da sua rede
+
+Recomendação da Canaã Telecom:
+
+Recomendamos a instalação de medidas internas de segurança como senhas fortes, autenticação em duas etapas e restrição de IPs.
+
+Declaro estar ciente dos riscos mencionados acima e solicito, sob minha responsabilidade, a abertura de porta externa na minha rede.
+    </div>
+
+    <form id="formulario">
+      <label for="nome">Nome completo:</label>
+      <input type="text" id="nome" name="nome_completo" required />
+
+      <label for="cpf_cnpj">CPF ou CNPJ:</label>
+      <input type="text" id="cpf_cnpj" name="cpf_cnpj" required />
+
+      <label>Deseja acesso ao roteador?:</label>
+      <div class="radio-group">
+        <label><input type="radio" name="acesso_roteador" value="SIM" required /> SIM</label>
+        <label><input type="radio" name="acesso_roteador" value="NÃO" /> NÃO</label>
+      </div>
+
+      <div id="ip-container">
+        <div class="ip-group" data-index="1">
+          <label for="ip_ports_1">Endereço IP e Portas:</label>
+          <input type="text" id="ip_ports_1" name="ip_ports_1" required />
+
+          <label for="finalidade_1">Finalidade da abertura:</label>
+          <input type="text" id="finalidade_1" name="finalidade_1" required />
+        </div>
+      </div>
+
+      <button type="button" id="add-ip">Adicionar outro IP</button>
+
+      <label>Protocolo:</label>
+      <div class="radio-group">
+        <label><input type="radio" name="protocolo" value="TCP" required /> TCP</label>
+        <label><input type="radio" name="protocolo" value="UDP" /> UDP</label>
+        <label><input type="radio" name="protocolo" value="Ambos" /> Ambos</label>
+      </div>
+
+      <label for="data">Data:</label>
+      <input type="date" id="data" name="data" required />
+
+      <label for="assinatura">Assinatura (nome completo):</label>
+      <input type="text" id="assinatura" name="assinatura" required />
+
+      <button type="submit">Enviar solicitação</button>
+    </form>
+  </div>
+
+  <script>
+    // Botão para adicionar novos IPs
+    document.getElementById('add-ip').addEventListener('click', function() {
+      const container = document.getElementById('ip-container');
+      const index = container.querySelectorAll('.ip-group').length + 1;
+
+      const div = document.createElement('div');
+      div.classList.add('ip-group');
+      div.innerHTML = `
+        <label for="ip_ports_${index}">Endereço IP e Portas:</label>
+        <input type="text" id="ip_ports_${index}" name="ip_ports_${index}" required />
+
+        <label for="finalidade_${index}">Finalidade da abertura:</label>
+        <input type="text" id="finalidade_${index}" name="finalidade_${index}" required />
+      `;
+      container.appendChild(div);
+    });
+
+    // Enviar para a versão mobile do Gmail
+    document.getElementById('formulario').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const nome = document.getElementById('nome').value;
+      const cpf = document.getElementById('cpf_cnpj').value;
+      const acesso = document.querySelector('input[name="acesso_roteador"]:checked').value;
+      const protocolo = document.querySelector('input[name="protocolo"]:checked').value;
+      const data = document.getElementById('data').value;
+      const assinatura = document.getElementById('assinatura').value;
+
+      let ips = "";
+      document.querySelectorAll('.ip-group').forEach((group, i) => {
+        const ipPorts = group.querySelector(`input[name="ip_ports_${i+1}"]`).value;
+        const finalidade = group.querySelector(`input[name="finalidade_${i+1}"]`).value;
+        ips += `\nIP ${i+1}: ${ipPorts} - Finalidade: ${finalidade}`;
+      });
+
+      const assunto = "Solicitação de Abertura de Porta Externa";
+      const corpo = 
+        `Nome: ${nome}\nCPF/CNPJ: ${cpf}\nAcesso ao roteador: ${acesso}${ips}\nProtocolo: ${protocolo}\nData: ${data}\nAssinatura: ${assinatura}`;
+
+      // Link da versão mobile do Gmail
+      const gmailMobileUrl = `https://mail.google.com/mail/mu/mp/148/#co?to=analise.n2@canaatelecom.com.br&su=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
+
+      window.open(gmailMobileUrl, '_blank');
+    });
+  </script>
+</body>
+</html>
