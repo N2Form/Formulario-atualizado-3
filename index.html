@@ -29,54 +29,27 @@
       text-align: center;
       margin-bottom: 20px;
     }
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
+    label { display:block; margin-top:15px; font-weight:bold; }
     input[type="text"], input[type="date"] {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      box-sizing: border-box;
+      width:100%; padding:8px; margin-top:5px; box-sizing:border-box;
     }
-    .radio-group {
-      margin-top: 5px;
-    }
-    .radio-group label {
-      font-weight: normal;
-      margin-right: 20px;
-    }
-    button {
-      margin-top: 25px;
-      padding: 10px 20px;
-      background-color: #003366;
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-size: 16px;
-      border-radius: 4px;
-    }
-    button:hover {
-      background-color: #0055a5;
-    }
+    .radio-group { margin-top:5px; }
+    .radio-group label { font-weight:normal; margin-right:20px; }
     .term-text {
       white-space: pre-wrap;
-      background: #f9f9f9;
-      border: 1px solid #ddd;
-      margin-bottom: 25px;
-      max-height: 250px;
-      overflow-y: auto;
-      padding: 15px;
-      border-radius: 6px;
+      background:#f9f9f9; border:1px solid #ddd;
+      margin-bottom:25px; max-height:250px; overflow-y:auto;
+      padding:15px; border-radius:6px;
     }
     .ip-group {
-      border: 1px solid #ccc;
-      padding: 15px;
-      margin-top: 15px;
-      border-radius: 6px;
-      background-color: #fafafa;
+      border:1px solid #ccc; padding:15px; margin-top:15px;
+      border-radius:6px; background:#fafafa;
     }
+    button {
+      margin-top:25px; padding:10px 20px; background-color:#003366;
+      color:white; border:none; cursor:pointer; font-size:16px; border-radius:4px;
+    }
+    button:hover { background-color:#0055a5; }
   </style>
 </head>
 <body>
@@ -146,18 +119,16 @@ Declaro estar ciente dos riscos mencionados acima e solicito, sob minha responsa
   </div>
 
   <script>
-    // Redirecionamento automático para celular
-    if (/Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent)) {
-      window.location.href = "https://mail.google.com/mail/mu/mp/999/#tl/priority/%5Esmartlabel_personal";
-    }
+    // E-mail de destino (alterar se precisar)
+    const RECIPIENT = "analise.n2@canaatelecom.com.br";
 
-    // Botão para adicionar novos IPs
+    // Adicionar novos blocos de IP dinamicamente
     document.getElementById('add-ip').addEventListener('click', function() {
       const container = document.getElementById('ip-container');
       const index = container.querySelectorAll('.ip-group').length + 1;
-
       const div = document.createElement('div');
       div.classList.add('ip-group');
+      div.setAttribute('data-index', index);
       div.innerHTML = `
         <label for="ip_ports_${index}">Endereço IP e Portas:</label>
         <input type="text" id="ip_ports_${index}" name="ip_ports_${index}" required />
@@ -167,36 +138,76 @@ Declaro estar ciente dos riscos mencionados acima e solicito, sob minha responsa
       container.appendChild(div);
     });
 
-    // Enviar dados para o Gmail
+    // Detecta mobile
+    function isMobile() {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+
+    // Tenta abrir uma URL e, se não, usa fallback
+    function tryOpenWithFallback(appUrl, webUrl, finalFallback) {
+      // Tenta abrir app url (vai funcionar se app instalado)
+      window.location.href = appUrl;
+      // Depois de um curto delay, tenta webUrl (se o app não abriu)
+      setTimeout(function() {
+        window.location.href = webUrl;
+      }, 800);
+      // Como último recurso, abrir mailto (por segurança)
+      setTimeout(function() {
+        window.location.href = finalFallback;
+      }, 1800);
+    }
+
+    // Submit handler: monta corpo e abre compose do Gmail (app ou web)
     document.getElementById('formulario').addEventListener('submit', function(e) {
       e.preventDefault();
 
-      const nome = document.getElementById('nome').value;
-      const cpf = document.getElementById('cpf_cnpj').value;
-      const acesso = document.querySelector('input[name="acesso_roteador"]:checked').value;
-      const protocolo = document.querySelector('input[name="protocolo"]:checked').value;
+      const nome = document.getElementById('nome').value.trim();
+      const cpf = document.getElementById('cpf_cnpj').value.trim();
+      const acessoElem = document.querySelector('input[name="acesso_roteador"]:checked');
+      const acesso = acessoElem ? acessoElem.value : '';
+      const protocoloElem = document.querySelector('input[name="protocolo"]:checked');
+      const protocolo = protocoloElem ? protocoloElem.value : '';
       const data = document.getElementById('data').value;
-      const assinatura = document.getElementById('assinatura').value;
+      const assinatura = document.getElementById('assinatura').value.trim();
 
-      let ips = "";
-      document.querySelectorAll('.ip-group').forEach((group, i) => {
-        const ipPorts = group.querySelector(`input[name="ip_ports_${i+1}"]`).value;
-        const finalidade = group.querySelector(`input[name="finalidade_${i+1}"]`).value;
-        ips += `\nIP ${i+1}: ${ipPorts} - Finalidade: ${finalidade}`;
+      // monta lista de IPs
+      let ipsText = "";
+      document.querySelectorAll('.ip-group').forEach((group, idx) => {
+        const i = idx + 1;
+        const ipInp = group.querySelector(`[name="ip_ports_${i}"]`);
+        const finInp = group.querySelector(`[name="finalidade_${i}"]`);
+        const ipv = ipInp ? ipInp.value.trim() : "";
+        const finv = finInp ? finInp.value.trim() : "";
+        if (ipv || finv) {
+          ipsText += `IP ${i}: ${ipv} - Finalidade: ${finv}\n`;
+        }
       });
 
       const assunto = "Solicitação de Abertura de Porta Externa";
-      const corpo = 
+      const corpoSimples =
 `Nome: ${nome}
 CPF/CNPJ: ${cpf}
 Acesso ao roteador: ${acesso}
-${ips}
-Protocolo: ${protocolo}
+
+${ipsText}Protocolo: ${protocolo}
 Data: ${data}
 Assinatura: ${assinatura}`;
 
-      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=analise.n2@canaatelecom.com.br&su=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
-      window.open(gmailUrl, '_blank');
+      const subjectEnc = encodeURIComponent(assunto);
+      const bodyEnc = encodeURIComponent(corpoSimples);
+
+      // URLs
+      const webGmail = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(RECIPIENT)}&su=${subjectEnc}&body=${bodyEnc}`;
+      const gmailApp = `googlegmail://co?to=${encodeURIComponent(RECIPIENT)}&subject=${subjectEnc}&body=${bodyEnc}`;
+      const mailtoFallback = `mailto:${encodeURIComponent(RECIPIENT)}?subject=${subjectEnc}&body=${bodyEnc}`;
+
+      if (isMobile()) {
+        // Tenta abrir o app Gmail; se não, abre web compose; se não, mailto
+        tryOpenWithFallback(gmailApp, webGmail, mailtoFallback);
+      } else {
+        // Desktop: abrir em nova aba o Gmail web compose
+        window.open(webGmail, '_blank');
+      }
     });
   </script>
 </body>
